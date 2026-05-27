@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+enum ChatCategory {
+  UNCLASSIFIED
+  BILLING
+  TECHNICAL
+  SALES
+  GENERAL_SUPPORT
+}
+
+enum MessageSender {
+  customer
+  agent
+}
+
+model Business {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  agents    Agent[]
+}
+
+model Agent {
+  id             String           @id @default(cuid())
+
+  business       Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  businessId     String
+
+  name           String
+  welcomeMessage String
+  systemPrompt   String
+
+  primaryColor   String
+  accentColor    String
+
+  avatarUrl      String?
+
+  createdAt      DateTime         @default(now())
+
+  knowledge      KnowledgeSource[]
+  chats          ChatSession[]
+}
+
+model KnowledgeSource {
+  id        String   @id @default(cuid())
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId   String
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  knowledgeChunks KnowledgeChunk[]
+}
+
+model KnowledgeChunk {
+  id                String           @id @default(cuid())
+  knowledgeSource   KnowledgeSource  @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
+  knowledgeSourceId String
+  content           String
+  embeddingId       String?
+  createdAt         DateTime @default(now())
+  @@index([knowledgeSourceId])
+}
+
+model ChatSession {
+  id            String        @id @default(cuid())
+  agent         Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agentId       String
+  category      ChatCategory  @default(UNCLASSIFIED)
+  rating        Int?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  messages      Message[]
+}
+
+model Message {
+  id            String        @id @default(cuid())
+  chatSession   ChatSession   @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+  chatSessionId String
+  sender        MessageSender
+  content       String
+  createdAt     DateTime      @default(now())
+}

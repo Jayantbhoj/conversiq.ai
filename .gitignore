@@ -1,0 +1,95 @@
+# =========================
+# Node Modules
+# =========================
+node_modules
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# =========================
+# Next.js
+# =========================
+.next
+out
+
+# =========================
+# NestJS / Build Output
+# =========================
+dist
+coverage
+
+# =========================
+# Logs
+# =========================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE
+# =========================
+.vscode
+.idea
+
+# =========================
+# Prisma
+# =========================
+.prisma
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Local Database / Volumes
+# =========================
+postgres_data
+
+# =========================
+# Frontend Specific
+# =========================
+apps/frontend/.next
+apps/frontend/node_modules
+
+# =========================
+# Backend Specific
+# =========================
+apps/backend/dist
+apps/backend/node_modules
+
+# =========================
+# Temporary Files
+# =========================
+tmp
+temp
+.cache
+
+# =========================
+# Testing
+# =========================
+coverage
+.nyc_output
+
+# =========================
+# Misc
+# =========================
+*.pem
+*.pid
+*.seed
+*.pid.lock
