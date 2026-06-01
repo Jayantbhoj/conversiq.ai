@@ -2,22 +2,87 @@
 
 AI-powered customer support platform with custom RAG agents for businesses.
 
----
 
-# Tech Stack
+## Table of Contents
 
-## Frontend
+* [Tech Stack](#tech-stack)
+
+  * [Frontend](#frontend)
+  * [Backend](#backend)
+  * [Database](#database)
+  * [Infrastructure](#infrastructure)
+
+* [Project Structure](#project-structure)
+
+* [Prerequisites](#prerequisites)
+
+* [Backend Environment Variables](#backend-environment-variables)
+
+* [Recommended Development Workflow](#recommended-development-workflow)
+
+  * [Start PostgreSQL Only](#start-postgresql-only)
+
+* [Backend Setup](#backend-setup)
+
+* [Prisma Commands](#prisma-commands)
+
+  * [Generate Prisma Client](#generate-prisma-client)
+  * [Create Initial Migration](#create-initial-migration)
+  * [Create Future Migrations](#create-future-migrations)
+  * [Apply Existing Production Migrations](#apply-existing-production-migrations)
+
+* [Reset Database](#reset-database)
+
+* [Run Backend](#run-backend)
+
+* [Frontend Setup](#frontend-setup)
+
+* [Full Development Workflow](#full-development-workflow)
+
+  * [Terminal 1 — Postgres](#terminal-1--postgres)
+  * [Terminal 2 — Backend](#terminal-2--backend)
+  * [Terminal 3 — Frontend](#terminal-3--frontend)
+
+* [Viewing Database Tables](#viewing-database-tables)
+
+  * [Option 1 — pgAdmin](#option-1--pgadmin)
+
+* [Docker Production Workflow](#docker-production-workflow)
+
+  * [Start Entire Application](#start-entire-application)
+  * [Run Entire Application In Background](#run-entire-application-in-background)
+  * [Stop Entire Application](#stop-entire-application)
+  * [Remove Volumes Too](#remove-volumes-too)
+
+* [Backend Docker Notes](#backend-docker-notes)
+
+* [Useful Docker Commands](#useful-docker-commands)
+
+  * [View Running Containers](#view-running-containers)
+  * [Stop All Containers](#stop-all-containers)
+  * [Remove Docker Build Cache](#remove-docker-build-cache)
+  * [Remove Unused Docker Resources](#remove-unused-docker-resources)
+
+* [Recommended Development Architecture](#recommended-development-architecture)
+
+  * [Development](#development)
+  * [Production](#production)
+
+
+## Tech Stack
+
+### Frontend
 - Next.js
 - TailwindCSS
 
-## Backend
+### Backend
 - NestJS
 - Prisma ORM
 
-## Database
+### Database
 - PostgreSQL
 
-## Infrastructure
+### Infrastructure
 - Docker
 - Docker Compose
 
@@ -31,6 +96,7 @@ customer-support-rag/
 ├── apps/
 │   ├── frontend/
 │   └── backend/
+│   └── rag/
 │
 ├── docker-compose.yml
 │
@@ -53,7 +119,7 @@ Recommended:
 
 ---
 
-# Backend Environment Variables
+## Backend Environment Variables
 
 Create:
 
@@ -66,7 +132,7 @@ Example:
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5434/customer_support_rag"
 
-PORT=4000
+PORT=8000
 
 NODE_ENV=development
 ```
@@ -88,9 +154,9 @@ Benefits:
 - easier Prisma workflow
 - easier database inspection
 
----
 
-# Start PostgreSQL Only
+
+## Start PostgreSQL Only
 
 From project root:
 
@@ -104,9 +170,9 @@ Verify:
 docker ps
 ```
 
----
 
-# Backend Setup
+
+## Backend Setup
 
 Go to backend:
 
@@ -122,17 +188,17 @@ npm install
 
 ---
 
-# Prisma Commands
+## Prisma Commands
 
-## Generate Prisma Client
+### Generate Prisma Client
 
 ```bash
 npx prisma generate
 ```
 
----
 
-## Create Initial Migration
+
+### Create Initial Migration
 
 ```bash
 npx prisma migrate dev --name init
@@ -144,9 +210,9 @@ This will:
 - update database
 - generate Prisma client
 
----
 
-## Create Future Migrations
+
+### Create Future Migrations
 
 Example:
 
@@ -154,15 +220,15 @@ Example:
 npx prisma migrate dev --name add-business-model
 ```
 
----
 
-## Apply Existing Production Migrations
+
+### Apply Existing Production Migrations
 
 ```bash
 npx prisma migrate deploy
 ```
 
----
+
 
 ## Reset Database
 
@@ -175,7 +241,7 @@ npx prisma migrate reset
 
 ---
 
-# Run Backend
+## Run Backend
 
 ```bash
 npm run start:dev
@@ -184,12 +250,12 @@ npm run start:dev
 Backend runs on:
 
 ```txt
-http://localhost:4000
+http://localhost:8000
 ```
 
 ---
 
-# Frontend Setup
+## Frontend Setup
 
 Go to frontend:
 
@@ -276,7 +342,7 @@ Production uses:
 - backend container
 - postgres container
 
----
+
 
 # Start Entire Application
 
