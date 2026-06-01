@@ -1,0 +1,31 @@
+export const DOCUMENT_TAGS = {
+  POLICY: 'policy',
+  REFUND: 'refund',
+  RETURNS: 'returns',
+  SHIPPING: 'shipping',
+  DELIVERY: 'delivery',
+  PRIVACY: 'privacy',
+  TERMS: 'terms',
+  FAQ: 'faq',
+  SUPPORT: 'support',
+  BILLING: 'billing',
+  PAYMENTS: 'payments',
+  WARRANTY: 'warranty',
+  PRODUCT: 'product',
+  CATALOG: 'catalog',
+  PRICING: 'pricing',
+  SALES: 'sales',
+  TRAINING: 'training',
+  SOP: 'sop',
+  COMPLIANCE: 'compliance',
+  LEGAL: 'legal',
+  HR: 'hr',
+  ONBOARDING: 'onboarding',
+  TROUBLESHOOTING: 'troubleshooting',
+  TECHNICAL: 'technical',
+  API: 'api',
+  INTEGRATION: 'integration',
+} as const;
+
+export type DocumentTag =
+  (typeof DOCUMENT_TAGS)[keyof typeof DOCUMENT_TAGS];

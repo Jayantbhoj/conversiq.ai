@@ -3,12 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerModule } from './common/logger/logger.module';
 import { HealthModule } from './api/health/health.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { AgentsModule } from './agents/agents.module';
+import { PrismaModule } from './database/prisma.module';
 import { ChatsModule } from './api/chats/chats.module';
+import { AgentsModule } from './api/agents/agents.module';
+import { DocumentsModule } from './api/documents/documents.module';
+import { StorageModule } from './api/documents/storage/storage.module';
 
 @Module({
-  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule],
+  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule],
   controllers: [AppController],
   providers: [AppService]
 })

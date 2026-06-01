@@ -3,6 +3,10 @@ import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
 export class CreateAgentDto {
   @IsString()
   @IsNotEmpty()
+  businessId!: string;
+
+  @IsString()
+  @IsNotEmpty()
   name!: string;
 
   @IsString()

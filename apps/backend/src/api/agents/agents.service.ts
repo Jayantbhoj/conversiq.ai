@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateAgentDto } from './dtos/create-agent.dto';
 import { UpdateAgentDto } from './dtos/update-agent.dto';
-import { CreateKnowledgeDto } from './dtos/create-knowledge.dto';
+import { PrismaService } from '../../database/prisma.service';
 
 @Injectable()
 export class AgentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
 
   findAll() {
     return this.prisma.agent.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -18,68 +19,43 @@ export class AgentsService {
     return this.prisma.agent.findUnique({
       where: { id },
       include: {
-        knowledge: true,
-        chats: true
-      }
+        documents: true,
+        chatSessions: true,
+      },
     });
   }
 
   create(data: CreateAgentDto) {
     return this.prisma.agent.create({
       data: {
+        businessId: data.businessId,
         name: data.name,
         welcomeMessage: data.welcomeMessage,
         systemPrompt: data.systemPrompt,
         primaryColor: data.primaryColor,
         accentColor: data.accentColor,
-        avatarUrl: data.avatarUrl
-      }
+        avatarUrl: data.avatarUrl,
+      },
     });
   }
 
   update(id: string, data: UpdateAgentDto) {
     return this.prisma.agent.update({
       where: { id },
-      data
+      data,
     });
   }
 
   remove(id: string) {
     return this.prisma.agent.delete({
-      where: { id }
-    });
-  }
-
-  findKnowledge(agentId: string) {
-    return this.prisma.knowledgeSource.findMany({
-      where: { agentId },
-      orderBy: { createdAt: 'desc' }
-    });
-  }
-
-  addKnowledge(agentId: string, data: CreateKnowledgeDto) {
-    return this.prisma.knowledgeSource.create({
-      data: {
-        agentId,
-        title: data.title,
-        content: data.content
-      }
-    });
-  }
-
-  removeKnowledge(agentId: string, knowledgeId: string) {
-    return this.prisma.knowledgeSource.deleteMany({
-      where: {
-        id: knowledgeId,
-        agentId
-      }
+      where: { id },
     });
   }
 
   findChats(agentId: string) {
     return this.prisma.chatSession.findMany({
       where: { agentId },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   }
 
@@ -87,8 +63,8 @@ export class AgentsService {
     return this.prisma.chatSession.create({
       data: {
         agentId,
-        category: 'UNCLASSIFIED'
-      }
+        category: 'UNCLASSIFIED',
+      },
     });
   }
 }

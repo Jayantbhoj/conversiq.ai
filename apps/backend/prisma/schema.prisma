@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 enum ChatCategory {
@@ -16,76 +16,132 @@ enum ChatCategory {
 }
 
 enum MessageSender {
-  customer
-  agent
+  CUSTOMER
+  AGENT
+}
+
+enum DocumentStatus {
+  PENDING
+  UPLOADING
+  PROCESSING
+  COMPLETED
+  FAILED
 }
 
 model Business {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
 
-  agents    Agent[]
+  name        String
+  email       String   @unique
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  agents      Agent[]
 }
 
 model Agent {
-  id             String           @id @default(cuid())
+  id              String   @id @default(cuid())
 
-  business       Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  businessId     String
+  businessId      String
+  business        Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
-  name           String
-  welcomeMessage String
-  systemPrompt   String
+  name            String
 
-  primaryColor   String
-  accentColor    String
+  welcomeMessage  String
+  systemPrompt    String
 
-  avatarUrl      String?
+  primaryColor    String
+  accentColor     String
 
-  createdAt      DateTime         @default(now())
+  avatarUrl       String?
 
-  knowledge      KnowledgeSource[]
-  chats          ChatSession[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  documents       Document[]
+  chatSessions    ChatSession[]
+
+  @@index([businessId])
 }
 
-model KnowledgeSource {
-  id        String   @id @default(cuid())
-  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  agentId   String
-  title     String
-  content   String
-  createdAt DateTime @default(now())
-  knowledgeChunks KnowledgeChunk[]
+model Document {
+  id              String @id @default(cuid())
+
+  agentId         String
+  agent           Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  filename        String
+  mimeType        String
+  fileSize        Int
+
+  r2Key           String
+
+  status          DocumentStatus
+
+  content         String?
+  tags            String[]
+  metadata        Json?
+  
+  chunkCount      Int @default(0)
+
+  processingError String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  chunks          Chunk[]
+
+  @@index([agentId])
 }
 
-model KnowledgeChunk {
-  id                String           @id @default(cuid())
-  knowledgeSource   KnowledgeSource  @relation(fields: [knowledgeSourceId], references: [id], onDelete: Cascade)
-  knowledgeSourceId String
-  content           String
-  embeddingId       String?
-  createdAt         DateTime @default(now())
-  @@index([knowledgeSourceId])
+model Chunk {
+  id              String @id @default(cuid())
+
+  documentId      String
+  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  chunkIndex      Int
+
+  content         String
+
+  embeddingId     String?
+  metadata        Json?
+
+  createdAt       DateTime @default(now())
+
+  @@index([documentId])
 }
 
 model ChatSession {
-  id            String        @id @default(cuid())
-  agent         Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  agentId       String
-  category      ChatCategory  @default(UNCLASSIFIED)
-  rating        Int?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  messages      Message[]
+  id              String @id @default(cuid())
+
+  agentId         String
+  agent           Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  category        ChatCategory @default(UNCLASSIFIED)
+
+  rating          Int?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  messages        Message[]
+
+  @@index([agentId])
 }
 
 model Message {
-  id            String        @id @default(cuid())
-  chatSession   ChatSession   @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
-  chatSessionId String
-  sender        MessageSender
-  content       String
-  createdAt     DateTime      @default(now())
+  id              String @id @default(cuid())
+
+  chatSessionId   String
+  chatSession     ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+
+  sender          MessageSender
+
+  content         String
+
+  createdAt       DateTime @default(now())
+
+  @@index([chatSessionId])
 }

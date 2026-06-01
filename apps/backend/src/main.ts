@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -18,7 +19,7 @@ async function bootstrap() {
   );
   app.enableCors();
 
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+  const port = 8000;
   await app.listen(port);
   app.get(LoggerService).log(`Backend API listening on http://localhost:${port}`);
 }

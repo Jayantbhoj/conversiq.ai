@@ -10,6 +10,7 @@
     "build:backend": "npm run build --prefix apps/backend"
   },
   "dependencies": {
-    "@google/genai": "^2.6.0"
+    "@google/genai": "^2.6.0",
+    "@nestjs/config": "^4.0.4"
   }
 }
