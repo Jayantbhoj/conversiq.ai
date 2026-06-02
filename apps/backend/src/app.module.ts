@@ -8,9 +8,18 @@ import { ChatsModule } from './api/chats/chats.module';
 import { AgentsModule } from './api/agents/agents.module';
 import { DocumentsModule } from './api/documents/documents.module';
 import { StorageModule } from './api/documents/storage/storage.module';
+import { BullModule } from '@nestjs/bullmq';
+
 
 @Module({
-  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule],
+  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule,
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+      },
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService]
 })

@@ -17,5 +17,5 @@ COPY --from=builder /usr/src/app/package.json ./package.json
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
-EXPOSE 4000
+EXPOSE 8000
 CMD ["node", "dist/main.js"]

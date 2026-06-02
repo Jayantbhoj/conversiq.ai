@@ -3,7 +3,9 @@ import { AgentsService } from './agents.service';
 import { CreateAgentDto } from './dtos/create-agent.dto';
 import { UpdateAgentDto } from './dtos/update-agent.dto';
 import { CreateKnowledgeDto } from './dtos/create-knowledge.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Agents')
 @Controller('agents')
 export class AgentsController {
   constructor(private readonly agentsService: AgentsService) {}

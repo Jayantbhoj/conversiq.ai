@@ -2,7 +2,9 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { CreateMessageDto } from './dtos/create-message.dto';
 import { UpdateRatingDto } from './dtos/update-rating.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Chats')
 @Controller('chats')
 export class ChatsController {
   constructor(private readonly chatsService: ChatsService) {}

@@ -81,6 +81,7 @@ AI-powered customer support platform with custom RAG agents for businesses.
 
 ### Database
 - PostgreSQL
+- Redis (BullMQ)
 
 ### Infrastructure
 - Docker
@@ -252,7 +253,8 @@ Backend runs on:
 ```txt
 http://localhost:8000
 ```
-
+## Swagger API Doc
+After running backend service you can access API Documentation on http://localhost:8000/api/docs
 ---
 
 ## Frontend Setup
@@ -293,7 +295,14 @@ docker compose up -d postgres
 
 ---
 
-## Terminal 2 — Backend
+## Terminal 2 — Redis
+
+```bash
+docker compose up -d redis
+```
+---
+
+## Terminal 3 — Backend
 
 ```bash
 cd apps/backend
@@ -307,7 +316,7 @@ npm run start:dev
 
 ---
 
-## Terminal 3 — Frontend
+## Terminal 4 — Frontend
 
 ```bash
 cd apps/frontend
@@ -439,6 +448,7 @@ docker system prune -a -f
 ```txt
 Docker:
   postgres
+  redis
 
 Local:
   backend
@@ -454,6 +464,7 @@ Docker:
   frontend
   backend
   postgres
+  redis
 ```
 
 ---

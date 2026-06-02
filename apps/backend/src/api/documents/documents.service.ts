@@ -5,7 +5,11 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { StorageService } from './storage/storage.service';
-import { UploadDocumentInput } from 'src/common/interfaces/upload-document-input.interface';
+import { UploadDocumentInput } from '@/common/interfaces/upload-document-input.interface';
+import { Document } from '@prisma/client';
+import * as path from 'path';
+import { IngestionProducer } from '@/rag/ingestion/ingestion.producer';
+
 
 
 @Injectable()
@@ -13,7 +17,25 @@ export class DocumentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly storageService: StorageService,
+    private readonly ingestionProducer: IngestionProducer,
+
   ) {}
+
+  async findById(documentId: string): Promise<Document> {
+    const document = await this.prisma.document.findUnique({
+      where: {
+        id: documentId,
+      },
+    });
+
+    if (!document) {
+      throw new NotFoundException(
+        `Document ${documentId} not found`,
+      );
+    }
+
+    return document;
+  }
 
   async uploadDocument(input: UploadDocumentInput) {
     const { agentId, file, tags } = input;
@@ -32,7 +54,11 @@ export class DocumentsService {
     }
 
     let document;
-
+    const extension = path
+      .extname(file.originalname)
+      .replace('.', '')
+      .toLowerCase();
+    
     try {
       document = await this.prisma.document.create({
         data: {
@@ -43,6 +69,11 @@ export class DocumentsService {
           fileSize: file.size,
 
           r2Key: '',
+          tags, 
+          metadata: {
+            source: 'upload',
+            extension: extension
+          },
 
           status: 'PENDING',
         },
@@ -69,7 +100,7 @@ export class DocumentsService {
         file,
       );
 
-      await this.prisma.document.update({
+      const updatedDocument = await this.prisma.document.update({
         where: {
           id: document.id,
         },
@@ -77,21 +108,13 @@ export class DocumentsService {
           status: 'PROCESSING',
         },
       });
-
-
-      const updatedDocument =
-        await this.prisma.document.update({
-          where: {
-            id: document.id,
-          },
-          data: {
-            status: 'COMPLETED',
-
-            // content,
-          },
-        });
+      
+      await this.ingestionProducer.enqueueDocument(
+        document.id,
+      );
 
       return updatedDocument;
+
     } catch (error) {
       if (document) {
         await this.prisma.document.update({
@@ -113,4 +136,48 @@ export class DocumentsService {
       );
     }
   }
+  
+  async updateChunkCount(
+    documentId: string,
+    chunkCount: number,
+  ) {
+    return this.prisma.document.update({
+      where: {
+        id: documentId,
+      },
+      data: {
+        chunkCount,
+      },
+    });
+  }
+
+  async markCompleted(
+    documentId: string,
+  ) {
+    return this.prisma.document.update({
+      where: {
+        id: documentId,
+      },
+      data: {
+        status: 'COMPLETED',
+        processingError: null,
+      },
+    });
+  }
+
+  async markFailed(
+    documentId: string,
+    error: string,
+  ) {
+    return this.prisma.document.update({
+      where: {
+        id: documentId,
+      },
+      data: {
+        status: 'FAILED',
+        processingError: error,
+      },
+    });
+  }
+
 }
