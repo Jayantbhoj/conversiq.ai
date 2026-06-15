@@ -9,10 +9,11 @@ import { AgentsModule } from './api/agents/agents.module';
 import { DocumentsModule } from './api/documents/documents.module';
 import { StorageModule } from './api/documents/storage/storage.module';
 import { BullModule } from '@nestjs/bullmq';
+import { EmbeddingModule } from './rag/embeddings/embedding.module';
 
 
 @Module({
-  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule,
+  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule, EmbeddingModule,
     BullModule.forRoot({
       connection: {
         host: process.env.REDIS_HOST,
