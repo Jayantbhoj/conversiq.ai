@@ -112,7 +112,7 @@ export default function Home() {
             <Bot size={20} color="#fff" />
           </div>
           <span style={{ fontSize: "1.4rem", fontWeight: 800, letterSpacing: "-0.03em" }}>
-            Aura<span style={{ color: "var(--primary)" }}>Support</span>
+            Conversiq<span style={{ color: "var(--primary)" }}> AI</span>
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -167,7 +167,7 @@ export default function Home() {
             <FileText size={24} />
           </div>
           <h3 style={{ fontSize: "1.25rem", color: "var(--foreground)" }}>Instant RAG Training</h3>
-          <p>Upload text files or paste FAQ articles. AuraSupport instantly chunks and indexes your data, providing your agent with the context needed to respond accurately.</p>
+          <p>Upload text files or paste FAQ articles. Conversiq AI instantly chunks and indexes your data, providing your agent with the context needed to respond accurately.</p>
         </div>
 
         <div className="glass-card animate-fade-in" style={{ padding: "30px", display: "flex", flexDirection: "column", gap: "16px", animationDelay: "0.1s" }}>
@@ -358,7 +358,7 @@ export default function Home() {
         color: "var(--foreground-muted)",
         fontSize: "0.85rem"
       }}>
-        <p>© 2026 AuraSupport SaaS Builder. Designed with rich glassmorphism & responsive layouts.</p>
+        <p>© 2026 Conversiq AI SaaS Builder. Designed with rich glassmorphism & responsive layouts.</p>
       </footer>
     </main>
   );

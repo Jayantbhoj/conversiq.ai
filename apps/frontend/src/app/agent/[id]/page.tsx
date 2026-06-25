@@ -11,17 +11,15 @@ import {
   Smile,
   ShieldAlert
 } from "lucide-react";
+import { Agent, Message } from "@/lib/storage";
 import { 
-  getAgentById, 
-  getMessages, 
-  sendMessage, 
-  createChat, 
-  submitRating,
-  initializeStorage,
-  Agent, 
-  Message 
-} from "@/lib/storage";
-
+  fetchAgent, 
+  fetchMessages, 
+  sendChatMessage, 
+  createChatSession, 
+  submitChatRating, 
+  queryAgentResponse 
+} from "@/lib/api";
 
 export default function CustomerAgentChat() {
   const params = useParams();
@@ -34,59 +32,68 @@ export default function CustomerAgentChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [showRatingSuccess, setShowRatingSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Load Agent info and initialize chat session
   useEffect(() => {
     if (!agentId) return;
-    initializeStorage();
-    const currentAgent = getAgentById(agentId);
-    
-    if (currentAgent) {
-      setAgent(currentAgent);
 
-      // Session restore or create
-      const sessionKey = `aura_session_${agentId}`;
-      let activeChatId = sessionStorage.getItem(sessionKey);
+    async function initChat() {
+      try {
+        setLoading(true);
+        const currentAgent = await fetchAgent(agentId);
+        setAgent(currentAgent);
 
-      if (!activeChatId) {
-        // Create new chat
-        const session = createChat(agentId);
-        activeChatId = session.id;
-        sessionStorage.setItem(sessionKey, activeChatId);
-        
-        // Add welcome greeting
-        const greeting: Message = {
-          id: "welcome-greeting",
-          chatSessionId: activeChatId,
-          sender: "agent",
-          content: currentAgent.welcomeMessage,
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem(`rag_messages_${activeChatId}`, JSON.stringify([greeting]));
+        // Session restore or create
+        const sessionKey = `aura_session_${agentId}`;
+        let activeChatId = sessionStorage.getItem(sessionKey);
+
+        if (!activeChatId) {
+          // Create new chat session on backend
+          const session = await createChatSession(agentId);
+          activeChatId = session.id;
+          sessionStorage.setItem(sessionKey, activeChatId);
+          
+          // Add welcome greeting to database
+          await sendChatMessage(activeChatId, "agent", currentAgent.welcomeMessage);
+        }
+
+        setChatId(activeChatId);
+      } catch (err) {
+        console.error("Failed to initialize agent chat:", err);
+      } finally {
+        setLoading(false);
       }
-
-      setChatId(activeChatId);
     }
+
+    initChat();
   }, [agentId]);
 
   // Sync Messages and handle typing indicator
-  const loadMessages = () => {
+  const loadMessages = async () => {
     if (!chatId) return;
-    const msgs = getMessages(chatId);
-    setMessages(msgs);
+    try {
+      const msgs = await fetchMessages(chatId);
+      setMessages(msgs);
 
-    if (msgs.length > 0 && msgs[msgs.length - 1].sender === "customer") {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
+      if (msgs.length > 0 && msgs[msgs.length - 1].sender === "customer") {
+        setIsTyping(true);
+      } else {
+        setIsTyping(false);
+      }
+    } catch (err) {
+      console.error("Failed to load chat messages:", err);
     }
   };
 
   useEffect(() => {
-    loadMessages();
-    window.addEventListener("storage-chat-update", loadMessages);
-    return () => window.removeEventListener("storage-chat-update", loadMessages);
+    if (chatId) {
+      loadMessages();
+      // Poll database for new messages every 3 seconds
+      const interval = setInterval(loadMessages, 3000);
+      return () => clearInterval(interval);
+    }
   }, [chatId]);
 
   // Auto scroll to bottom
@@ -96,23 +103,62 @@ export default function CustomerAgentChat() {
     }
   }, [messages, isTyping]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim() || !chatId || !agent) return;
 
-    sendMessage(agent.id, chatId, "customer", inputText);
+    const userText = inputText;
     setInputText("");
+
+    try {
+      // 1. Send customer message to backend
+      const customerMsg = await sendChatMessage(chatId, "customer", userText);
+      setMessages(prev => [...prev, customerMsg]);
+      setIsTyping(true);
+
+      // 2. Query chatbot retrieval pipeline
+      const queryResult = await queryAgentResponse(agent.id, userText);
+
+      // 3. Post chatbot reply to session database
+      const agentMsg = await sendChatMessage(chatId, "agent", queryResult.response);
+      setMessages(prev => [...prev, agentMsg]);
+    } catch (err) {
+      console.error("Failed to handle sending message:", err);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
-  const handleRate = (stars: number) => {
+  const handleRate = async (stars: number) => {
     if (!agent || !chatId) return;
-    submitRating(agent.id, chatId, stars);
-    setRating(stars);
-    setShowRatingSuccess(true);
-    setTimeout(() => {
-      setShowRatingSuccess(false);
-    }, 3000);
+    try {
+      await submitChatRating(chatId, stars);
+      setRating(stars);
+      setShowRatingSuccess(true);
+      setTimeout(() => {
+        setShowRatingSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Failed to submit session rating:", err);
+    }
   };
+
+  if (loading) {
+    return (
+      <div style={{
+        display: "flex", 
+        flexDirection: "column", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        minHeight: "100vh", 
+        gap: "16px",
+        padding: "24px",
+        textAlign: "center"
+      }}>
+        <p style={{ color: "#fff" }}>Connecting to chat server...</p>
+      </div>
+    );
+  }
 
   if (!agent) {
     return (

@@ -17,7 +17,7 @@ export class ChatsService {
     const message = await this.prisma.message.create({
       data: {
         chatSessionId: chatId,
-        sender: data.sender === MessageSender.AGENT ? 'agent' : 'customer',
+        sender: data.sender === MessageSender.AGENT ? 'AGENT' : 'CUSTOMER',
         content: data.content
       }
     });

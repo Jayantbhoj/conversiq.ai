@@ -184,6 +184,8 @@ a {
   padding: 40px;
   max-width: 1400px;
   width: calc(100% - 260px);
+  position: relative;
+  z-index: 200;
 }
 
 /* Interactive Elements */

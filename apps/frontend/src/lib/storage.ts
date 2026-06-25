@@ -1,5 +1,13 @@
+export interface Business {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+}
+
 export interface Agent {
   id: string;
+  businessId: string;
   name: string;
   welcomeMessage: string;
   systemPrompt: string;
@@ -35,9 +43,25 @@ export interface Message {
 }
 
 // Default Seed Data
+const DEFAULT_BUSINESSES: Business[] = [
+  {
+    id: "business-1",
+    name: "Gemini Enterprises",
+    email: "contact@gemini.com",
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: "business-2",
+    name: "Aura Cosmetics",
+    email: "info@auracosmetics.com",
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
+
 const DEFAULT_AGENTS: Agent[] = [
   {
     id: "gemini-gadgets",
+    businessId: "business-1",
     name: "Gemini Gadgets Bot",
     welcomeMessage: "Hi there! Welcome to Gemini Gadgets. How can I help you with our tech gear today?",
     systemPrompt: "You are an expert customer support agent for Gemini Gadgets. Be polite, friendly, and search your knowledge base for product specifications and policies. If you do not know the answer, politely ask them to email support@geminigadgets.com.",
@@ -48,6 +72,7 @@ const DEFAULT_AGENTS: Agent[] = [
   },
   {
     id: "aura-beauty",
+    businessId: "business-2",
     name: "Aura Skincare Guide",
     welcomeMessage: "Hello! I am your Aura Beauty guide. Tell me about your skin type, or ask about our botanical face oils!",
     systemPrompt: "You are a skincare consulting agent for Aura Beauty. Give tips on dry/oily skin, recommend products from your knowledge base, and emphasize natural vegan ingredients.",
@@ -198,6 +223,11 @@ function isClient() {
 
 export function initializeStorage() {
   if (!isClient()) return;
+  
+  if (!localStorage.getItem("rag_businesses")) {
+    localStorage.setItem("rag_businesses", JSON.stringify(DEFAULT_BUSINESSES));
+  }
+  
   if (!localStorage.getItem("rag_agents")) {
     localStorage.setItem("rag_agents", JSON.stringify(DEFAULT_AGENTS));
     
@@ -213,6 +243,45 @@ export function initializeStorage() {
       localStorage.setItem(`rag_messages_${chatId}`, JSON.stringify(data));
     });
   }
+}
+
+export function getBusinesses(): Business[] {
+  if (!isClient()) return DEFAULT_BUSINESSES;
+  initializeStorage();
+  const raw = localStorage.getItem("rag_businesses");
+  return raw ? JSON.parse(raw) : [];
+}
+
+export function createBusiness(name: string, email: string): Business {
+  const list = getBusinesses();
+  const id = "business-" + Math.random().toString(36).substring(2, 9);
+  const newBusiness: Business = {
+    id,
+    name,
+    email,
+    createdAt: new Date().toISOString()
+  };
+  list.push(newBusiness);
+  localStorage.setItem("rag_businesses", JSON.stringify(list));
+  if (isClient()) {
+    window.dispatchEvent(new Event("storage-business-update"));
+  }
+  return newBusiness;
+}
+
+export function getActiveBusinessId(): string | null {
+  if (!isClient()) return null;
+  return localStorage.getItem("rag_active_business_id");
+}
+
+export function setActiveBusinessId(id: string | null) {
+  if (!isClient()) return;
+  if (id === null) {
+    localStorage.removeItem("rag_active_business_id");
+  } else {
+    localStorage.setItem("rag_active_business_id", id);
+  }
+  window.dispatchEvent(new Event("storage-active-business-change"));
 }
 
 export function getAgents(): Agent[] {

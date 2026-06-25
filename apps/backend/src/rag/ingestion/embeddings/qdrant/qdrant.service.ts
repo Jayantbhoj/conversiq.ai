@@ -202,6 +202,7 @@ export class QdrantService
     businessId: string,
     limit = 5,
     documentId?: string,
+    agentId?: string,
   ) {
     const filter = {
       must: [
@@ -219,6 +220,15 @@ export class QdrantService
         key: 'documentId',
         match: {
           value: documentId,
+        },
+      });
+    }
+
+    if (agentId) {
+      filter.must.push({
+        key: 'agentId',
+        match: {
+          value: agentId,
         },
       });
     }

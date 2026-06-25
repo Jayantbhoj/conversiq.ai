@@ -59,4 +59,12 @@ export class AgentsController {
   createChat(@Param('id') id: string) {
     return this.agentsService.createChat(id);
   }
+
+  @Post(':id/query')
+  queryAgent(
+    @Param('id') id: string,
+    @Body('query') query: string,
+  ) {
+    return this.agentsService.queryAgent(id, query);
+  }
 }
