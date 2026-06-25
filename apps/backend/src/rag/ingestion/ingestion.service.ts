@@ -8,6 +8,7 @@ import { ParserFactory } from './parser/parser.factory';
 import { ChunkingHelper } from './chunks/chunking.helper';
 import { ChunkService } from './chunks/chunking.service';
 import { PrismaService } from '@/database/prisma.service';
+import { EmbeddingProducer } from './queues/producers/embedding.producer';
 
 @Injectable()
 export class DocumentIngestionService {
@@ -17,6 +18,7 @@ export class DocumentIngestionService {
     private readonly storageService: StorageService,
     private readonly chunkingHelper: ChunkingHelper,
     private readonly chunkService: ChunkService,
+    private readonly embeddingProducer: EmbeddingProducer,
     private readonly logger: LoggerService,
   ) {}
 
@@ -90,6 +92,10 @@ export class DocumentIngestionService {
         chunkResult.children,
       );
 
+      await this.embeddingProducer.enqueueDocument(
+        document.id,
+      );
+
       const totalChunkCount =
         parentChunks.length +
         chunkResult.children.length;
@@ -100,7 +106,7 @@ export class DocumentIngestionService {
         },
         data: {
             chunkCount: totalChunkCount,
-            status: 'COMPLETED',
+            status: 'PROCESSING',
             processingError: null,
         },
       });

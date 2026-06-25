@@ -136,6 +136,16 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5434/customer_support_rag
 PORT=8000
 
 NODE_ENV=development
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Qdrant
+QDRANT_HOST=localhost
+QDRANT_PORT=6333
+QDRANT_COLLECTION=chunks
+QDRANT_VECTOR_SIZE=3072
 ```
 
 ---
@@ -186,6 +196,24 @@ Install dependencies:
 ```bash
 npm install
 ```
+
+### Redis + Qdrant Setup
+
+The project includes Redis and Qdrant services in `docker-compose.yml` on ports `6379` and `6333`.
+
+For local development, make sure the following environment variables are set in `apps/backend/.env`:
+
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+QDRANT_HOST=localhost
+QDRANT_PORT=6333
+QDRANT_COLLECTION=chunks
+QDRANT_VECTOR_SIZE=3072
+```
+
+Set `QDRANT_VECTOR_SIZE` to match your embedding model output dimension. For Gemini embeddings, use `3072`.
 
 ---
 
@@ -295,10 +323,10 @@ docker compose up -d postgres
 
 ---
 
-## Terminal 2 — Redis
+## Terminal 2 — Redis + Qdrant
 
 ```bash
-docker compose up -d redis
+docker compose up -d redis qdrant
 ```
 ---
 
@@ -330,7 +358,7 @@ npm run dev
 
 # Viewing Database Tables
 
-## Option 1 — pgAdmin
+## postgres— pgAdmin
 
 Connection details:
 
@@ -342,6 +370,15 @@ Password: postgres
 Database: customer_support_rag
 ```
 
+## postgres— prisma studio
+npx prisma generate
+npx prisma studio
+
+## QDrant- dashboard
+open inbuilt qdrant dashboard if running on docker
+
+http://localhost:6333/dashboard
+
 ---
 
 # Docker Production Workflow
@@ -350,6 +387,8 @@ Production uses:
 - frontend container
 - backend container
 - postgres container
+- redis container
+- qdrant container
 
 
 

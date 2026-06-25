@@ -9,16 +9,20 @@ import { AgentsModule } from './api/agents/agents.module';
 import { DocumentsModule } from './api/documents/documents.module';
 import { StorageModule } from './api/documents/storage/storage.module';
 import { BullModule } from '@nestjs/bullmq';
-import { EmbeddingModule } from './rag/embeddings/embedding.module';
-
+import { EmbeddingModule } from './rag/ingestion/embeddings/embedding.module';
+import { QdrantModule } from './rag/ingestion/embeddings/qdrant/qdrant.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule, EmbeddingModule,
+  imports: [LoggerModule, HealthModule, PrismaModule, AgentsModule, ChatsModule, DocumentsModule, StorageModule, EmbeddingModule, QdrantModule,
     BullModule.forRoot({
       connection: {
         host: process.env.REDIS_HOST,
         port: Number(process.env.REDIS_PORT),
       },
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
   controllers: [AppController],

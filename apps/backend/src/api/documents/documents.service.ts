@@ -8,7 +8,7 @@ import { StorageService } from './storage/storage.service';
 import { UploadDocumentInput } from '@/common/interfaces/upload-document-input.interface';
 import { Document } from '@prisma/client';
 import * as path from 'path';
-import { IngestionProducer } from '@/rag/ingestion/ingestion.producer';
+import { IngestionProducer } from '@/rag/ingestion/queues/producers/ingestion.producer';
 
 
 
