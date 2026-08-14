@@ -6,8 +6,8 @@ import {
 
 import { LoggerService } from '@/common/logger/logger.service';
 
-import { DocumentParser } from './interfaces/document-parser.interface';
-import { ParsedDocument } from './interfaces/parsed-document.interface';
+import { DocumentParser } from '../../../common/interfaces/parser/document-parser.interface';
+import { ParsedDocument } from '../../../common/interfaces/parser/parsed-document.interface';
 
 @Injectable()
 export class MarkdownParser

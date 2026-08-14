@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { DocumentParser } from "./interfaces/document-parser.interface";
+import { DocumentParser } from "../../../common/interfaces/parser/document-parser.interface";
 import { PdfParser } from "./pdf.parser";
 import { TxtParser } from "./txt.parser";
 import { MarkdownParser } from "./markdown.parser";

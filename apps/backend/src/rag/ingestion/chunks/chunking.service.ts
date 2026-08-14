@@ -5,7 +5,7 @@ import {
 
 import { PrismaService } from '@/database/prisma.service';
 import { LoggerService } from '@/common/logger/logger.service';
-import { ChildChunkResult, ParentChunkResult } from './interfaces/chunk-result.interface';
+import { ChildChunkResult, ParentChunkResult } from '../../../common/interfaces/chunks/chunk-result.interface';
 
 
 

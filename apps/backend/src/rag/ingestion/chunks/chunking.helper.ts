@@ -10,7 +10,7 @@ import {
   ChildChunkResult,
   ChunkingResult,
   ParentChunkResult,
-} from './interfaces/chunk-result.interface';
+} from '../../../common/interfaces/chunks/chunk-result.interface';
 
 @Injectable()
 export class ChunkingHelper {
